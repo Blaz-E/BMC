@@ -6,8 +6,10 @@ import { db } from "@/lib/db";
 import { demoTournaments, withDemo } from "@/lib/demo";
 import { rupiah, tanggal } from "@/lib/format";
 import { statusBadge, gameColor } from "@/lib/data";
+import { requireRole } from "@/lib/session";
 
 export default async function OrganizerHome() {
+  await requireRole("ORGANIZER", "/organizer");
   const tournaments = await withDemo(
     () =>
       db.tournament.findMany({

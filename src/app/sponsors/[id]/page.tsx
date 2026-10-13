@@ -7,6 +7,7 @@ import { demoProposalDetail, withDemo } from "@/lib/demo";
 import { rupiah } from "@/lib/format";
 import { calcSponsorDeal } from "@/lib/fees";
 import { fundProposalAction } from "@/lib/actions";
+import { requireSession } from "@/lib/session";
 
 const input =
   "w-full rounded-xl border-[3px] border-black bg-white px-3 py-2 font-body text-sm font-medium text-black";
@@ -17,6 +18,7 @@ export default async function ProposalDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireSession(`/sponsors/${id}`);
   const p = await withDemo(
     () =>
       db.sponsorProposal.findUnique({

@@ -1,6 +1,5 @@
-import { DemoBanner } from "@/components/layout/DemoBanner";
 import { Navbar, Footer } from "@/components/layout/Navbar";
-import { BrutaCard, BrutaBadge, BrutaLink } from "@/components/ui/bruta";
+import { BrutaBadge, BrutaLink } from "@/components/ui/bruta";
 import { gameColor, statusBadge, rupiah } from "@/lib/data";
 import { db } from "@/lib/db";
 import { demoTournaments, withDemo } from "@/lib/demo";
@@ -17,7 +16,6 @@ export default async function TournamentsPage() {
   );
   return (
     <div className="flex min-h-full flex-1 flex-col bg-void text-cream">
-      <DemoBanner />
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <BrutaBadge color="#FFD02B">Daftar Turnamen</BrutaBadge>

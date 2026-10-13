@@ -4,9 +4,11 @@ import { BrutaCard, BrutaBadge, BrutaLink } from "@/components/ui/bruta";
 import { db } from "@/lib/db";
 import { demoTournaments, demoDeals, withDemo } from "@/lib/demo";
 import { rupiah } from "@/lib/format";
-import { calcSaasFee, calcSponsorDeal } from "@/lib/fees";
+import { calcSaasFee } from "@/lib/fees";
+import { requireRole } from "@/lib/session";
 
 export default async function BillingPage() {
+  await requireRole("ORGANIZER", "/organizer/billing");
   const tournaments = await withDemo(
     () =>
       db.tournament.findMany({

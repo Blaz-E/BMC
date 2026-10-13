@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { switchRoleAction } from "@/lib/session";
+import { getSession, logoutAction, switchRoleAction, type Role } from "@/lib/session";
 
 const roles = [
   { role: "ORGANIZER", label: "Panitia", bg: "bg-arena text-white" },
@@ -33,14 +33,21 @@ export function RoleSwitcher({ active }: { active?: string }) {
   );
 }
 
-export function Navbar({ active }: { active?: string }) {
+const roleLabel: Record<Role, string> = {
+  ORGANIZER: "Panitia",
+  SPONSOR: "Sponsor",
+  PLAYER: "Player",
+};
+
+export async function Navbar({ active }: { active?: string }) {
+  const session = await getSession();
   return (
     <header className="no-print border-b-4 border-black bg-card">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-3">
           <span className="h-10 w-10 overflow-hidden rounded-lg border-[3px] border-black bg-sun shadow-bruta-sm">
             <Image
-              src="/images.jpeg"
+              src="/icon.jpeg"
               alt="Logo LombaEsport"
               width={40}
               height={40}
@@ -66,7 +73,37 @@ export function Navbar({ active }: { active?: string }) {
             Bantuan
           </Link>
         </nav>
-        <RoleSwitcher active={active} />
+
+        {session ? (
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden text-right lg:block">
+              <p className="max-w-[12rem] truncate font-display text-[11px] font-bold uppercase tracking-wide text-cream">
+                {session.name}
+              </p>
+              <p className="font-body text-[11px] text-mutedcream">
+                Masuk sebagai {roleLabel[session.role]}
+              </p>
+            </div>
+            <div className="hidden sm:block">
+              <RoleSwitcher active={active ?? roleLabel[session.role]} />
+            </div>
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="bruta-press cursor-pointer rounded-xl border-[3px] border-black bg-elevated px-3 py-2 font-display text-[11px] font-bold uppercase tracking-wide text-cream shadow-bruta-sm"
+              >
+                Keluar
+              </button>
+            </form>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="bruta-press rounded-xl border-[3px] border-black bg-arena px-4 py-2 font-display text-xs font-bold uppercase tracking-wide text-white shadow-bruta sm:px-5 sm:py-3 sm:text-sm"
+          >
+            Masuk
+          </Link>
+        )}
       </div>
     </header>
   );

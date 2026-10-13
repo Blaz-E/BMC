@@ -7,6 +7,7 @@ import { demoTournamentDetail, withDemo } from "@/lib/demo";
 import { rupiah } from "@/lib/format";
 import { createProposalAction } from "@/lib/actions";
 import { buildProposal } from "@/lib/proposal";
+import { requireRole } from "@/lib/session";
 
 const input =
   "w-full rounded-xl border-[3px] border-black bg-white px-3 py-2 font-body text-sm font-medium text-black";
@@ -17,6 +18,7 @@ export default async function SponsorshipPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireRole("ORGANIZER", `/organizer/tournaments/${id}/sponsorship`);
   const t = await withDemo(
     () =>
       db.tournament.findUnique({

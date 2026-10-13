@@ -6,8 +6,10 @@ import { demoProposals, demoDeals, demoAdSlots, withDemo } from "@/lib/demo";
 import { rupiah } from "@/lib/format";
 import { calcSponsorDeal } from "@/lib/fees";
 import { bookAdAction } from "@/lib/actions";
+import { requireRole } from "@/lib/session";
 
 export default async function SponsorHome() {
+  await requireRole("SPONSOR", "/sponsor");
   const proposals = await withDemo(
     () =>
       db.sponsorProposal.findMany({

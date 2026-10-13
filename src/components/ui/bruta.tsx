@@ -12,26 +12,6 @@ const variantClass: Record<Variant, string> = {
   dark: "bg-elevated text-cream",
 };
 
-export function BrutaButton({
-  variant = "primary",
-  className,
-  children,
-  ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant }) {
-  return (
-    <button
-      {...props}
-      className={cn(
-        "bruta-press cursor-pointer rounded-xl border-[3px] border-black px-5 py-3 font-display text-sm font-bold uppercase tracking-wide shadow-bruta",
-        variantClass[variant],
-        className
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
 export function BrutaLink({
   variant = "primary",
   className,

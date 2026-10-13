@@ -4,11 +4,13 @@ import { BrutaCard, BrutaBadge } from "@/components/ui/bruta";
 import { createTournamentAction } from "@/lib/actions";
 import { GAMES } from "@/lib/constants";
 import { calcSaasFee } from "@/lib/fees";
+import { requireRole } from "@/lib/session";
 
 const input =
   "w-full rounded-xl border-[3px] border-black bg-white px-3 py-2 font-body text-sm font-medium text-black";
 
-export default function NewTournamentPage() {
+export default async function NewTournamentPage() {
+  await requireRole("ORGANIZER", "/organizer/tournaments/new");
   const fee16 = calcSaasFee(16, 0);
   const feeLoyal = calcSaasFee(16, 3);
 

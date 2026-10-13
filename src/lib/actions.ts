@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { calcSponsorDeal, calcTicket, mockPay } from "@/lib/fees";
 import { buildProposal } from "@/lib/proposal";
+import { requireRole, requireSession } from "@/lib/session";
 
 const newTournamentSchema = z.object({
   title: z.string().min(4).max(80),
@@ -19,6 +20,7 @@ const newTournamentSchema = z.object({
 });
 
 export async function createTournamentAction(formData: FormData) {
+  const session = await requireRole("ORGANIZER", "/organizer/tournaments/new");
   const parsed = newTournamentSchema.safeParse({
     title: formData.get("title"),
     game: formData.get("game"),
@@ -32,8 +34,7 @@ export async function createTournamentAction(formData: FormData) {
   if (!parsed.success) throw new Error("Form belum valid — cek lagi isian.");
   const d = parsed.data;
 
-  const org = await db.user.findFirst({ where: { role: "ORGANIZER" } });
-  if (!org) throw new Error("Organizer seed belum ada — jalankan db:seed.");
+  const org = { id: session.userId };
 
   const t = await db.tournament.create({
     data: {
@@ -76,6 +77,7 @@ const proposalSchema = z.object({
 });
 
 export async function createProposalAction(formData: FormData) {
+  await requireRole("ORGANIZER");
   const parsed = proposalSchema.safeParse({
     tournamentId: formData.get("tournamentId"),
     title: formData.get("title"),
@@ -123,6 +125,7 @@ const fundSchema = z.object({
 });
 
 export async function fundProposalAction(formData: FormData) {
+  const session = await requireRole("SPONSOR");
   const parsed = fundSchema.safeParse({
     proposalId: formData.get("proposalId"),
     amount: formData.get("amount"),
@@ -130,8 +133,7 @@ export async function fundProposalAction(formData: FormData) {
   if (!parsed.success) throw new Error("Nominal minimal Rp 50.000.");
   const { proposalId, amount } = parsed.data;
 
-  const sponsor = await db.user.findFirst({ where: { role: "SPONSOR" } });
-  if (!sponsor) throw new Error("Sponsor seed belum ada.");
+  const sponsor = { id: session.userId };
   const { platformFee, netToOrganizer } = calcSponsorDeal(amount);
   const pay = await mockPay(amount);
 
@@ -158,6 +160,7 @@ const registerSchema = z.object({
 });
 
 export async function registerAction(formData: FormData) {
+  const session = await requireRole("PLAYER");
   const parsed = registerSchema.safeParse({
     tournamentId: formData.get("tournamentId"),
     teamName: formData.get("teamName"),
@@ -172,8 +175,7 @@ export async function registerAction(formData: FormData) {
   });
   if (!t) throw new Error("Turnamen tidak ditemukan.");
   if (t._count.registrations >= t.maxTeams) throw new Error("Slot penuh.");
-  const player = await db.user.findFirst({ where: { role: "PLAYER" } });
-  if (!player) throw new Error("Player seed belum ada.");
+  const player = { id: session.userId, name: session.name };
 
   const isSolo = mode === "solo";
   const ticket = calcTicket(t.entryFee, isSolo);
@@ -205,13 +207,13 @@ const lfgActionSchema = z.object({
 });
 
 export async function lfgInviteAction(formData: FormData) {
+  const session = await requireRole("PLAYER");
   const parsed = lfgActionSchema.safeParse({
     postId: formData.get("postId"),
     message: formData.get("message"),
   });
   if (!parsed.success) throw new Error("Pesan minimal 4 huruf.");
-  const player = await db.user.findFirst({ where: { role: "PLAYER" } });
-  if (!player) throw new Error("Player seed belum ada.");
+  const player = { id: session.userId };
 
   await db.lfgInvite.create({
     data: { postId: parsed.data.postId, fromUserId: player.id, message: parsed.data.message, accepted: true },
@@ -231,14 +233,14 @@ const bookAdSchema = z.object({
 });
 
 export async function bookAdAction(formData: FormData) {
+  const session = await requireRole("SPONSOR");
   const parsed = bookAdSchema.safeParse({
     slotId: formData.get("slotId"),
     brandName: formData.get("brandName"),
     bannerText: formData.get("bannerText"),
   });
   if (!parsed.success) throw new Error("Brand + teks banner wajib diisi.");
-  const sponsor = await db.user.findFirst({ where: { role: "SPONSOR" } });
-  if (!sponsor) throw new Error("Sponsor seed belum ada.");
+  const sponsor = { id: session.userId };
 
   await db.adBooking.create({
     data: {
@@ -260,13 +262,13 @@ const helpSchema = z.object({
 });
 
 export async function helpTicketAction(formData: FormData) {
+  const session = await requireSession("/help");
   const parsed = helpSchema.safeParse({
     subject: formData.get("subject"),
     message: formData.get("message"),
   });
   if (!parsed.success) throw new Error("Subjek + pesan belum lengkap.");
-  const user = await db.user.findFirst();
-  if (!user) throw new Error("User seed belum ada.");
+  const user = { id: session.userId };
 
   await db.helpTicket.create({
     data: { userId: user.id, subject: parsed.data.subject, message: parsed.data.message, status: "OPEN" },

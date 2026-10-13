@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DemoBanner } from "@/components/layout/DemoBanner";
 import { Navbar, Footer } from "@/components/layout/Navbar";
 import { BrutaCard, BrutaBadge, BrutaLink } from "@/components/ui/bruta";
 import { gameColor, statusBadge } from "@/lib/data";
@@ -32,7 +31,6 @@ export default async function Detail({ params }: { params: Promise<{ id: string 
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-void text-cream">
-      <DemoBanner />
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <div className="flex flex-wrap items-center gap-2">

@@ -4,8 +4,10 @@ import { BrutaCard, BrutaBadge, BrutaLink } from "@/components/ui/bruta";
 import { db } from "@/lib/db";
 import { demoTickets, withDemo } from "@/lib/demo";
 import { helpTicketAction } from "@/lib/actions";
+import { requireSession } from "@/lib/session";
 
 export default async function HelpPage() {
+  await requireSession("/help");
   const tickets = await withDemo(
     () =>
       db.helpTicket.findMany({

@@ -2,13 +2,15 @@ import { DemoBanner } from "@/components/layout/DemoBanner";
 import { Navbar, Footer } from "@/components/layout/Navbar";
 import { BrutaCard, BrutaBadge, BrutaLink } from "@/components/ui/bruta";
 import { db } from "@/lib/db";
-import { demoTournaments, demoLfgPosts, withDemo } from "@/lib/demo";
+import { demoTournaments, withDemo } from "@/lib/demo";
 import { rupiah, tanggal } from "@/lib/format";
 import { gameColor, statusBadge } from "@/lib/data";
 import { calcTicket } from "@/lib/fees";
 import { registerAction } from "@/lib/actions";
+import { requireRole } from "@/lib/session";
 
 export default async function PlayerHome() {
+  await requireRole("PLAYER", "/player");
   const tournaments = await withDemo(
     () =>
       db.tournament.findMany({

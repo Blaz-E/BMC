@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   description:
     "LombaEsport: Auto-Bracket, Sponsor Directory, LFG, Stream + slot iklan UMKM. Style Neobrutalism gelap + Retro Pop, font Lexend Mega.",
   icons: {
-    icon: "/images.jpeg",
-    apple: "/images.jpeg",
+    icon: "/icon.jpeg",
+    apple: "/icon.jpeg",
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className="h-full">
       <head>

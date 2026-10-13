@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { generateBracket, advanceWinner } from "@/lib/bracket";
+import { requireRole } from "@/lib/session";
 
 export async function generateBracketAction(tournamentId: string) {
+  await requireRole("ORGANIZER");
   const regs = await db.registration.findMany({
     where: { tournamentId },
     orderBy: { seed: "asc" },
@@ -58,6 +60,7 @@ export async function generateBracketAction(tournamentId: string) {
 }
 
 export async function submitScoreAction(formData: FormData) {
+  await requireRole("ORGANIZER");
   const matchId = String(formData.get("matchId") ?? "");
   const tournamentId = String(formData.get("tournamentId") ?? "");
   const scoreA = parseInt(String(formData.get("scoreA") ?? ""), 10);
@@ -124,6 +127,7 @@ export async function submitScoreAction(formData: FormData) {
 }
 
 export async function resetBracketAction(tournamentId: string) {
+  await requireRole("ORGANIZER");
   await db.match.deleteMany({ where: { tournamentId } });
   await db.tournament.update({
     where: { id: tournamentId },

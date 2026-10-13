@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { demoLfgPosts, withDemo } from "@/lib/demo";
 import { gameColor } from "@/lib/data";
 import { lfgInviteAction } from "@/lib/actions";
+import { requireSession } from "@/lib/session";
 
 const AVATAR_BG = ["#8B5CF6", "#EF4444", "#FF6B1A", "#FFD02B", "#22C55E", "#22D3EE", "#FF4D8D"];
 
@@ -13,6 +14,7 @@ function initials(name: string) {
 }
 
 export default async function LfgPage() {
+  await requireSession("/lfg");
   const posts = await withDemo(
     () =>
       db.lfgPost.findMany({

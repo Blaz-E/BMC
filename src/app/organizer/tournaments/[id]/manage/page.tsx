@@ -12,6 +12,7 @@ import {
   submitScoreAction,
   resetBracketAction,
 } from "./actions";
+import { requireRole } from "@/lib/session";
 
 export default async function ManagePage({
   params,
@@ -19,6 +20,7 @@ export default async function ManagePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await requireRole("ORGANIZER", `/organizer/tournaments/${id}/manage`);
   const t = await withDemo(
     () =>
       db.tournament.findUnique({

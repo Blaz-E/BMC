@@ -5,8 +5,10 @@ import { db } from "@/lib/db";
 import { demoProposals, withDemo } from "@/lib/demo";
 import { rupiah } from "@/lib/format";
 import { calcSponsorDeal } from "@/lib/fees";
+import { requireSession } from "@/lib/session";
 
 export default async function SponsorsPage() {
+  await requireSession("/sponsors");
   const proposals = await withDemo(
     () =>
       db.sponsorProposal.findMany({

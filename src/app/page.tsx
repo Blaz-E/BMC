@@ -1,4 +1,3 @@
-import { DemoBanner } from "@/components/layout/DemoBanner";
 import { Navbar, Footer } from "@/components/layout/Navbar";
 import { BrutaLink, BrutaBadge, BrutaCard, Sticker } from "@/components/ui/bruta";
 import { gameColor, statusBadge } from "@/lib/data";
@@ -57,7 +56,7 @@ function Hero() {
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <BrutaLink href="/tournaments" variant="primary">Lihat Turnamen ↓</BrutaLink>
-            <BrutaLink href="/organizer" variant="ghost">Masuk Panitia</BrutaLink>
+            <BrutaLink href="/login?next=/organizer" variant="ghost">Masuk Panitia</BrutaLink>
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
             <BrutaBadge color="#B5E048">Auto-Bracket jalan</BrutaBadge>
@@ -96,6 +95,71 @@ function Hero() {
             </p>
           </BrutaCard>
           <Sticker className="absolute -top-4 right-6">LIVE!</Sticker>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function LiveNow() {
+  const live = await withDemo(
+    () =>
+      db.tournament.findMany({
+        where: { status: "ONGOING" },
+        orderBy: { startDate: "asc" },
+        include: { _count: { select: { registrations: true } } },
+      }),
+    demoTournaments.filter((t) => t.status === "ONGOING")
+  );
+  if (live.length === 0) return null;
+  return (
+    <section className="border-y-4 border-black bg-card">
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="flex items-center gap-2 rounded-full border-2 border-black bg-livered px-3 py-1 font-display text-[11px] font-bold uppercase tracking-widest text-white">
+            <span className="h-2 w-2 animate-blink-live rounded-full bg-white" />
+            Live
+          </span>
+          <h2 className="font-display text-2xl font-black text-cream">
+            SEDANG <span className="text-popcyan">BERLANGSUNG</span>
+          </h2>
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {live.map((t) => (
+            <article
+              key={t.id}
+              className="bruta-press overflow-hidden rounded-2xl border-[3px] border-black bg-elevated shadow-bruta"
+            >
+              <div
+                className="border-b-[3px] border-black px-4 py-5"
+                style={{ background: gameColor(t.game) }}
+              >
+                <p className="font-display text-[11px] font-black uppercase tracking-widest text-black">
+                  {t.game}
+                </p>
+                <p className="mt-1 font-display text-lg font-black leading-tight text-black">
+                  {t.title}
+                </p>
+              </div>
+              <div className="flex items-center justify-between gap-3 p-4">
+                <div>
+                  <p className="font-display text-lg font-black text-sun">
+                    {rupiah(t.prizePool)}
+                  </p>
+                  <p className="font-body text-xs text-mutedcream">
+                    {t._count.registrations}/{t.maxTeams} tim · tayang sekarang
+                  </p>
+                </div>
+                <BrutaLink
+                  href={`/tournaments/${t.id}`}
+                  variant="cyan"
+                  className="!px-3 !py-2 !text-xs"
+                >
+                  Tonton
+                </BrutaLink>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -211,11 +275,11 @@ function BracketPreview() {
 export default function Home() {
   return (
     <div className="flex min-h-full flex-1 flex-col bg-void font-body text-cream">
-      <DemoBanner />
       <Navbar />
       <main className="flex-1">
         <Hero />
         <Marquee />
+        <LiveNow />
         <TournamentGrid />
         <BracketPreview />
       </main>

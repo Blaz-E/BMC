@@ -2,7 +2,7 @@
 // Di lokal, DB asli tetap dipakai. Bentuk field disamakan dengan seed.
 
 // Bungkus query DB: kalau tabel tidak ada (P2021 di Vercel), pakai fallback.
-export async function withDemo<T>(fn: () => Promise<T>, fallback: any): Promise<T> {
+export async function withDemo<T>(fn: () => Promise<T>, fallback: unknown): Promise<T> {
   try {
     return await fn();
   } catch {
